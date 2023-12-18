@@ -1,12 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import './App.css'
 import { nanoid } from "nanoid";
 import Die from './Die'
 
 function App() {
+
   // Initializes dice state with random numbers
   const [dice, setDice] = useState(numbersGenerator());
+  const [tenzies, setTenzies] = useState(false)
+
+  // Keeps 2 states aligned: dice and tenzies
+  // if all dices are held and same value then tenzies will be true
+  useEffect(() => {
+    const gameWon = dice.every(item => {
+      return item.isHeld === true && item.value === dice[0].value
+    })
+
+    if (gameWon) {
+      setTenzies((prevTenzies) => !prevTenzies);
+      console.log("You won!")
+    }
+
+  }, [dice])
+
 
   // generates ONE new die
   function generateOneDie() {
