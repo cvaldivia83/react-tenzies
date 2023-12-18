@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import './App.css'
+import { nanoid } from "nanoid";
 import Die from './Die'
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
     const numbersArray = []
     for(let i = 0; i < 10; i+=1) {
       const newNumber = Math.ceil(Math.random() * 6);
-      numbersArray.push(newNumber);
+      numbersArray.push({ id: nanoid(), value: newNumber, isHeld: false });
     }
     return numbersArray;
   }
@@ -27,7 +28,7 @@ function App() {
 
   // Creates instances of Dice components
 
- const diceElements = dice.map((number, index) => <Die key={index + 1} value={number} />)
+ const diceElements = dice.map((die) => <Die key={die.id} value={die.value} isHeld={die.isHeld} />)
 
   return (
     <main>

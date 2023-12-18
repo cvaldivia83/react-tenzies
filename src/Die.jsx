@@ -1,6 +1,13 @@
 export default function Die(props) {
+
+  // creates background color when dice is clicked
+
+  const bkgColor = {
+    backgroundColor: props.isHeld ? "#59E391" : "#FFF"
+  }
+
   return (
-    <div className="dice">
+    <div className='dice' style={bkgColor} >
       <h2>{props.value}</h2>
     </div>
   )
