@@ -7,7 +7,7 @@ export default function Die(props) {
   }
 
   return (
-    <div className='dice' style={bkgColor} >
+    <div className='dice' style={bkgColor} onClick={ props.holdDice } >
       <h2>{props.value}</h2>
     </div>
   )

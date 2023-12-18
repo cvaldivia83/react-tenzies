@@ -5,30 +5,57 @@ import { nanoid } from "nanoid";
 import Die from './Die'
 
 function App() {
+  // Initializes dice state with random numbers
+  const [dice, setDice] = useState(numbersGenerator());
 
-  // generates random number (6 - 1)
+  // generates ONE new die
+  function generateOneDie() {
+    const newNumber = Math.ceil(Math.random() * 6);
+    return { id: nanoid(), value: newNumber, isHeld: false };
+  }
 
+  // generates an array with 10 objects that contain random numbers (6 - 1)
   function numbersGenerator() {
-    const numbersArray = []
-    for(let i = 0; i < 10; i+=1) {
-      const newNumber = Math.ceil(Math.random() * 6);
-      numbersArray.push({ id: nanoid(), value: newNumber, isHeld: false });
+    const numbersArray = [];
+    for (let i = 0; i < 10; i += 1) {
+      numbersArray.push(generateOneDie());
     }
     return numbersArray;
   }
 
   // generates new numbers for new game on click
+  // if dice isHeld == true we keep the dice
+  // if it's false we create a new dice generateOne Die()
 
   function rollDice() {
-    setDice(numbersGenerator())
+    setDice((prevDice) =>
+      prevDice.map((item) => {
+        return item.isHeld ? item : generateOneDie();
+      })
+    );
   }
 
-  // Initializes dice state with random numbers
-  const[dice, setDice] = useState(numbersGenerator())
+  // controls dice isHeld State in child components
+
+  function holdDice(id) {
+    setDice((prevDice) =>
+      prevDice.map((item) => {
+        return item.id === id ? { ...item, isHeld: !item.isHeld } : item;
+      })
+    );
+  }
 
   // Creates instances of Dice components
 
- const diceElements = dice.map((die) => <Die key={die.id} value={die.value} isHeld={die.isHeld} />)
+  const diceElements = dice.map((die) => (
+    <Die
+      key={die.id}
+      id={die.id}
+      value={die.value}
+      isHeld={die.isHeld}
+      holdDice={() => holdDice(die.id)}
+    />
+  ));
 
   return (
     <main>
@@ -39,12 +66,12 @@ function App() {
           current value between rolls.
         </p>
 
-        <div className="dice-container">
-          {diceElements}
-        </div>
+        <div className="dice-container">{diceElements}</div>
 
         <div className="btn-container">
-          <button className="btn-play" onClick={rollDice}>Roll</button>
+          <button className="btn-play" onClick={rollDice}>
+            Roll
+          </button>
         </div>
       </div>
     </main>
