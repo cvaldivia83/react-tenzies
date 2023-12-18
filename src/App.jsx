@@ -63,7 +63,7 @@ function App() {
     );
   }
 
-  // Resets dice for new game
+  // Resets dice & tenzies for new game
   function resetDice() {
     setDice(prevDice => numbersGenerator())
     setTenzies(prevTenzies => false)
