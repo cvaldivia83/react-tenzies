@@ -10,20 +10,38 @@ function App() {
   // Initializes dice state with random numbers
   const [dice, setDice] = useState(numbersGenerator());
   const [tenzies, setTenzies] = useState(false)
+  const [score, setScore] = useState(generateNewScore())
+
 
   // Keeps 2 states aligned: dice and tenzies
   // if all dices are held and same value then tenzies will be true
+
   useEffect(() => {
-    const gameWon = dice.every(item => {
-      return item.isHeld === true && item.value === dice[0].value
-    })
+    const gameWon = dice.every((item) => {
+      return item.isHeld === true && item.value === dice[0].value;
+    });
+    setFinishTime();
+    setScore(prevScore => {
+      return { ...prevScore, total_time: setTotalTime() };
+    });
 
     if (gameWon) {
       setTenzies((prevTenzies) => !prevTenzies);
 
     }
-
   }, [dice])
+
+
+
+
+  // if tenzies is true show score
+  useEffect(() => {
+    if (tenzies) {
+
+      createScoreElement();
+    }
+
+  }, [tenzies])
 
 
   // generates ONE new die
@@ -51,6 +69,10 @@ function App() {
         return item.isHeld ? item : generateOneDie();
       })
     );
+
+    setScore((prevScore) => {
+      return { ...prevScore, rolls: prevScore.rolls + 1 };
+    });
   }
 
   // controls dice isHeld State in child components
@@ -63,10 +85,63 @@ function App() {
     );
   }
 
+  // Sets game start time
+  function setStartTime() {
+    const oneDice = dice.filter(item => item.isHeld)
+    if (oneDice.length === 1) {
+      setScore((prevScore) => {
+        return { ...prevScore, start_time: new Date().getTime() };
+      });
+    }
+  }
+
+  // sets game finish time
+  function setFinishTime() {
+    setScore(prevScore => {
+      return {
+        ...prevScore,
+        finish_time: new Date().getTime()
+      };
+    })
+
+  }
+
+   // generates game score
+   function createScoreElement() {
+    const paragraph = document.createElement('p');
+    paragraph.classList.add('game-score');
+    paragraph.innerText = `Total attempts: ${score.rolls}  -  Total Time: ${score.total_time}`
+    const placeholder = document.getElementById('score-container');
+    placeholder.appendChild(paragraph);
+   }
+
+  //  removes game score from DOM
+  function removeScoreElement() {
+    const placeholder = document.getElementById("score-container");
+    placeholder.innerHTML = "";
+  }
+
+  //  Transforms milliseconds into min:sec
+  function setTotalTime() {
+    const milliseconds = score.finish_time - score.start_time;
+    const minutes = Math.floor(milliseconds / 60000).toString();
+    const seconds = Math.floor((milliseconds % 60000) / 1000);
+    const total = `${minutes}:${ seconds < 10 ? "0" : ""}${seconds.toString()}`
+    return total;
+  }
+
+
   // Resets dice & tenzies for new game
   function resetDice() {
-    setDice(prevDice => numbersGenerator())
-    setTenzies(prevTenzies => false)
+    setDice(numbersGenerator())
+    setTenzies(false)
+    removeScoreElement();
+    setScore(generateNewScore())
+  }
+
+  // generates new game score
+  function generateNewScore() {
+    return  {rolls: 0, start_time: new Date().getTime(), finish_time: new Date().getTime(), total_time: ''}
   }
 
   // Creates instances of Dice components
@@ -77,7 +152,7 @@ function App() {
       id={die.id}
       value={die.value}
       isHeld={die.isHeld}
-      holdDice={() => holdDice(die.id)}
+      holdDice={() => {holdDice(die.id); setStartTime()}}
     />
   ));
 
@@ -92,6 +167,8 @@ function App() {
         </p>
 
         <div className="dice-container">{diceElements}</div>
+
+        <div id="score-container"></div>
 
         <div className="btn-container">
           <button id="btn" className="btn-play" onClick={ tenzies ? resetDice : rollDice }>

@@ -61,6 +61,14 @@
   box-shadow: 0 1px 4px rgb(200, 200, 200);
 }
 
+.game-score {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: rebeccapurple;
+    text-align: center;
+    line-height: 2.0;
+}
+
 
 
 @media (max-width: 320px) {
